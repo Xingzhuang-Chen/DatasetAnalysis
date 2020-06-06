@@ -1,7 +1,7 @@
 clear all
 close all
 
-dataset = voc(fullfile('ImageSets', 'Main', 'all.txt'));
+dataset = voc(fullfile('ImageSets', 'Main', 'trainval.txt'));
 class = dataset{1};
 data = dataset{2};
 
@@ -40,6 +40,8 @@ title('image area')
 
 ratio = [];
 scale = [];
+width = [];
+height = [];
 for i = 1:length(class)
     figure('Name', class{i})
     subplot(1, 2, 1)
@@ -50,30 +52,33 @@ for i = 1:length(class)
     scale = [scale; class_list{i}(:, 5)];
     histogram(class_list{i}(:, 5), 100);
     title('box scale(box area/img area)');
+    width = [width; class_list{i}(:, 1)];
+    height = [height; class_list{i}(:, 2)];
 end
 figure('Name', 'All bbox')
 subplot(1, 2, 1)
 histogram(ratio, 0:0.05:5);
 title('box ratio');
 subplot(1, 2, 2)
-histogram(scale, 0:0.01:0.5);
+histogram(scale, 0:0.001:0.1);
 title('box scale(box area/img area)');
 
-original_wh = 1024;
+original_wh = 400;
 scale = scale*original_wh^2;
 
 anchor_scale = sqrt(scale)*(1./[4, 8, 16, 32, 64]);
 figure('Name', 'All stage anchor scale');
 hold on
-histogram(anchor_scale(:,1), (0:0.001:0.15)*original_wh)
-histogram(anchor_scale(:,2), (0:0.001:0.15)*original_wh)
-histogram(anchor_scale(:,3), (0:0.001:0.15)*original_wh)
-histogram(anchor_scale(:,4), (0:0.001:0.15)*original_wh)
-histogram(anchor_scale(:,5), (0:0.001:0.15)*original_wh)
+histogram(anchor_scale(:,1), (0:0.0005:0.1)*original_wh)
+histogram(anchor_scale(:,2), (0:0.0005:0.1)*original_wh)
+histogram(anchor_scale(:,3), (0:0.0005:0.1)*original_wh)
+histogram(anchor_scale(:,4), (0:0.0005:0.1)*original_wh)
+histogram(anchor_scale(:,5), (0:0.0005:0.1)*original_wh)
 title('All stage anchor scale');
 
-
-fprintf('original box scale(h,w) mean= %f\n', sqrt(mean(scale)));
+fprintf('max (h,w) = %f, min (h,w) = %f\n', max([width; height]), min([width; height]));
+fprintf('Equivalent square max (h,w) = %f, min (h,w) = %f\n', max(sqrt(scale)), min(sqrt(scale)));
+fprintf('original box scale(h,w) mean= %f\n', mean(sqrt(scale)));
 fprintf('stage1 box scale(h,w) mean= %f\n', mean(anchor_scale(:,1)));
 fprintf('stage2 box scale(h,w) mean= %f\n', mean(anchor_scale(:,2)));
 fprintf('stage3 box scale(h,w) mean= %f\n', mean(anchor_scale(:,3)));

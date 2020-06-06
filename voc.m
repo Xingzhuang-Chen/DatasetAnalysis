@@ -17,7 +17,7 @@ for i = 1:length(file_list)
     if isempty(file_name)
         continue
     end
-    dom = xmlread(fullfile('Annotations', sprintf('%s.xml', file_name)));
+    dom = xmlread(sprintf('Annotations\\%s.xml', file_name));
     sizeNode = dom.getElementsByTagName('size').item(0);
     width = str2double(sizeNode.getElementsByTagName('width').item(0).getTextContent);
     height = str2double(sizeNode.getElementsByTagName('height').item(0).getTextContent);
