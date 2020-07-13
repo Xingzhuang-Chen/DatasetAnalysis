@@ -89,6 +89,7 @@ def show_result(info, result_path, result_path_suffix):
     def show_class_info(info):
         boxes = info['boxes']
         label = info['label']
+        le = len(boxes)
         for i in range(len(info['class'])):
             class_box = boxes[label==i+1, :]
             class_name = info['class'][i]
@@ -103,7 +104,10 @@ def show_result(info, result_path, result_path_suffix):
             plt.close(f)
         plt.figure('All class')
         plt.subplot(121)
-        plt.hist(x=boxes[:, 2], bins=100, edgecolor='black', alpha=0.6)
+        # 拉伸96%
+        ratio =boxes[:, 2].copy()
+        ratio.sort()
+        plt.hist(x=ratio[int(le*0.02):int(le*0.98)], bins=100, edgecolor='black', alpha=0.6)
         plt.title('box ratio')
         plt.subplot(122)
         plt.hist(x=boxes[:, 4], bins=100, edgecolor='black', alpha=0.6)
@@ -135,7 +139,31 @@ def show_result(info, result_path, result_path_suffix):
 
         pass
 
+    def show_class_count(info):
+        CLASSES = info['class']
+        label = info['label'].tolist()
+        count = []
+        for c in range(len(CLASSES)):
+            count.append(label.count(c+1))
+        fig_name = 'Class count'
+        plt.figure(fig_name)
+        # 柱子总数
+        N = len(CLASSES)
+        # 包含每个柱子对应值的序列
+        values = count
+        # 包含每个柱子下标的序列
+        index = CLASSES
+        # 柱子的宽度
+        width = 0.45
+        # 绘制柱状图, 每根柱子的颜色为紫罗兰色
+        p2 = plt.bar(index, values, width, label="num", color="#87CEFA")
+        plt.ylabel('number of bbox', )
+        plt.xticks(rotation=90)
+        plt.savefig(osp.join(result_path, fig_name+'.jpg'))
+
+
     # plt.ion()
+    show_class_count(info)
     show_img_info(info)
     show_class_info(info)
     show_anchor_scale(info)
