@@ -150,15 +150,18 @@ def show_result(info, result_path, result_path_suffix):
         # 柱子总数
         N = len(CLASSES)
         # 包含每个柱子对应值的序列
-        values = count
+        values = np.array(count)
+        sort_idx = values.argsort()[::-1]
+        values = values[sort_idx]
         # 包含每个柱子下标的序列
-        index = CLASSES
+        index = [CLASSES[i] for i in sort_idx]
         # 柱子的宽度
         width = 0.45
         # 绘制柱状图, 每根柱子的颜色为紫罗兰色
         p2 = plt.bar(index, values, width, label="num", color="#87CEFA")
         plt.ylabel('number of bbox', )
         plt.xticks(rotation=90)
+        plt.gcf().subplots_adjust(bottom=0.3)
         plt.savefig(osp.join(result_path, fig_name+'.jpg'))
 
 
