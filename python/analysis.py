@@ -10,6 +10,8 @@ from datasets import Voc, Coco
 
 # 图像resize后等效矩形边长
 original_wh = 1024
+# box大小划分范围
+areaRng = np.array([[32 ** 2, 96 ** 2]], dtype=np.float)
 
 
 def parse_args():
@@ -29,7 +31,7 @@ def analysis(dataset):
     width = []
     height = []
     area = []
-    class_list = np.ndarray((0, 5), dtype=np.float)
+    class_list = np.ndarray((0, 6), dtype=np.float)
     box_label = np.ndarray((0,), dtype=np.int)
     for info in dataset:
         # img
@@ -44,7 +46,11 @@ def analysis(dataset):
         box_ratio = box_width/box_height
         box_area = box_width*box_height
         box_scale = box_area/img_area
-        class_list = np.vstack([class_list,np.hstack([box_width, box_height, box_ratio, box_area, box_scale])])
+
+        mask_area = info['ann']['area'].reshape(-1, 1)
+        box_area_class = ((mask_area - areaRng)>1).sum(1, keepdims=True)
+
+        class_list = np.vstack([class_list,np.hstack([box_width, box_height, box_ratio, box_area, box_scale, box_area_class])])
         box_label = np.hstack([box_label, info['ann']['labels']])
 
     info = {'width': width,
@@ -154,7 +160,7 @@ def show_result(info, result_path, result_path_suffix):
         sort_idx = values.argsort()[::-1]
         values = values[sort_idx]
         # 包含每个柱子下标的序列
-        index = [CLASSES[i] for i in sort_idx]
+        index = [CLASSES[j] + f'\n{values[i]}' for i, j in enumerate(sort_idx)]
         # 柱子的宽度
         width = 0.45
         # 绘制柱状图, 每根柱子的颜色为紫罗兰色
@@ -163,13 +169,27 @@ def show_result(info, result_path, result_path_suffix):
         plt.xticks(rotation=90)
         plt.gcf().subplots_adjust(bottom=0.3)
         plt.savefig(osp.join(result_path, fig_name+'.jpg'))
+        print(sum(values))
 
+    def show_area_class(info):
+        area_class = info['boxes'][:, 5]
+        count = [(area_class==c).sum() for c in range(3)]
+        index = [f'small({count[0]})', f'medium({count[1]})', f'large({count[2]})']
+
+        fig_name = 'area_class'
+        plt.figure(fig_name)
+        # 柱子的宽度
+        width = 0.45
+        # 绘制柱状图, 每根柱子的颜色为紫罗兰色
+        p2 = plt.bar(index, count, width, label="num", color="#87CEFA")
+        plt.savefig(osp.join(result_path, fig_name+'.jpg'))
 
     # plt.ion()
     show_class_count(info)
     show_img_info(info)
     show_class_info(info)
     show_anchor_scale(info)
+    show_area_class(info)
     # plt.ioff()
     plt.show()
 

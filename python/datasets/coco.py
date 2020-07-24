@@ -20,11 +20,14 @@ class Coco(Dataset):
             ann_info = self.coco.loadAnns(ann_ids)
             bbox = []
             label = []
+            area = []
             for k in ann_info:
                 bbox.append(k['bbox'])
                 label.append(k['category_id'])
+                area.append(k.get('area', k['bbox'][2]*k['bbox'][3]))
             ann = {'bboxes': np.array(bbox, dtype=np.float),
-                   'labels': np.array(label, dtype=np.int)}
+                   'labels': np.array(label, dtype=np.int),
+                   'area': np.array(area, dtype=np.int)}
             info['filename'] = info['file_name']
             info['ann'] = ann
             data_infos.append(info)
