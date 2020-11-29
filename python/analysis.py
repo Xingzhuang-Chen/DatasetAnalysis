@@ -74,21 +74,21 @@ def show_result(info, result_path, result_path_suffix):
         plt.figure()
         plt.subplot(2,2,1)
         plt.hist(x=info['width'], bins=100, edgecolor='black',  alpha=0.6)
-        plt.xlabel('width')
-        plt.ylabel('number')
-        plt.title('img width')
+        plt.xlabel('width', fontsize=15)
+        plt.ylabel('count', fontsize=15)
+        plt.title('img width', fontsize=15)
 
         plt.subplot(2,2,2)
         plt.hist(x=info['height'], bins=100, edgecolor='black',  alpha=0.6)
-        plt.xlabel('height')
-        plt.ylabel('number')
-        plt.title('img height')
+        plt.xlabel('height', fontsize=15)
+        plt.ylabel('count', fontsize=15)
+        plt.title('img height', fontsize=15)
 
         plt.subplot(2,1,2)
         plt.hist(x=info['area'], bins=100, edgecolor='black',  alpha=0.6)
-        plt.xlabel('area')
-        plt.ylabel('number')
-        plt.title('img area')
+        plt.xlabel('area', fontsize=15)
+        plt.ylabel('count', fontsize=15)
+        plt.title('img area', fontsize=15)
 
         plt.savefig(osp.join(result_path, 'image_size.jpg'))
 
@@ -165,8 +165,9 @@ def show_result(info, result_path, result_path_suffix):
         width = 0.45
         # 绘制柱状图, 每根柱子的颜色为紫罗兰色
         p2 = plt.bar(index, values, width, label="num", color="#87CEFA")
-        plt.ylabel('number of bbox', )
+        plt.ylabel('number of bbox', fontsize=15)
         plt.xticks(rotation=90)
+        plt.yticks(fontsize=15)
         plt.gcf().subplots_adjust(bottom=0.3)
         plt.savefig(osp.join(result_path, fig_name+'.jpg'))
         print(sum(values))
