@@ -41,6 +41,8 @@ def analysis(dataset):
         area.append(img_area)
 
         # class
+        if len(info['ann']['bboxes']) == 0:
+            continue
         box_width = info['ann']['bboxes'][:, 2].reshape(-1, 1)
         box_height = info['ann']['bboxes'][:, 3].reshape(-1, 1)
         box_ratio = box_width/box_height
@@ -150,7 +152,7 @@ def show_result(info, result_path, result_path_suffix):
         label = info['label'].tolist()
         count = []
         for c in range(len(CLASSES)):
-            count.append(label.count(c+1))
+            count.append(label.count(c))
         fig_name = 'Class count'
         plt.figure(fig_name)
         # 柱子总数
